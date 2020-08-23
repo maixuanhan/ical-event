@@ -137,9 +137,9 @@ export class Event {
                     while (isInbound(currentDate) || currentDate < serieStart) {
                         byday.forEach(r => {
                             let d = new Date(currentDate.getTime());
-                            d.setDate(d.getDate() + r.weekday - d.getDay() + (d.getDay() > r.weekday ? 7 : 0));
+                            d.setDate(d.getDate() + (r.weekday + 7 - d.getDay()) % 7);
                             const ds: Date[] = [];
-                            while (isInbound(d) && d.getMonth() === currentDate.getMonth()) {
+                            while (d.getMonth() === currentDate.getMonth()) {
                                 ds.push(d);
                                 d = new Date(d.getTime());
                                 d.setDate(d.getDate() + 7);
