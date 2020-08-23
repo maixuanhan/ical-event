@@ -1,2 +1,2 @@
-// tslint:disable-next-line
-console.log("Test");
+// tslint:disable:no-console
+console.log("DEBUG");
