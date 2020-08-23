@@ -34,8 +34,10 @@ describe("rrule DAILY freq", () => {
             },
         });
         const result = event.expandTimelines();
-        expect(result, "Number of occurrences").length(10);
-        expect(result.every(r => resList.some(s => s.getTime() === r.startTime)), "Instance values").be.true;
+        expect(result, "Number of occurrences").length(resList.length);
+        result.forEach(r => {
+            expect(resList.some(s => s.getTime() === r.startTime), `Instance values: ${new Date(r.startTime)}`).be.true;
+        });
     });
 
     // Daily until December 24, 1997:
@@ -107,7 +109,7 @@ describe("rrule DAILY freq", () => {
         });
         const result = event.expandTimelines();
         expect(result.length > 60, "Number of occurrences").be.true;
-        const data1997 = result.filter(r => new Date(r.startTime).getFullYear() === 1997)
+        const data1997 = result.filter(r => new Date(r.startTime).getFullYear() === 1997);
         expect(data1997.filter(r => new Date(r.startTime).getMonth() === 8),
             "Instance count for Sep 1997").length(15);
         expect(data1997.filter(r => new Date(r.startTime).getMonth() === 9),
@@ -147,8 +149,10 @@ describe("rrule DAILY freq", () => {
             },
         });
         const result = event.expandTimelines();
-        expect(result, "Number of occurrences").length(5);
-        expect(result.every(r => resList.some(s => s.getTime() === r.startTime)), "Instance values").be.true;
+        expect(result, "Number of occurrences").length(resList.length);
+        result.forEach(r => {
+            expect(resList.some(s => s.getTime() === r.startTime), `Instance values: ${new Date(r.startTime)}`).be.true;
+        });
     });
 
     // Every day in January, for 3 years:
@@ -195,4 +199,3 @@ describe("rrule DAILY freq", () => {
             "Instance values").be.true;
     });
 });
-

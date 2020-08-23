@@ -80,8 +80,10 @@ export class Event {
         const duration = this.event.duration ? this.event.duration : dtend - dtstart;
         const serieStart = new Date(dtstart);
         const serieEnd = new Date(UNTIL ? UNTIL : dtstart + EXPAND_YEAR * 366 * 24 * 60 * 60 * 1000);
-        const interval = rrule.INTERVAL ? rrule.INTERVAL : 1;
-        const byday = rrule.BYDAY ? [...rrule.BYDAY] : [];
+        const interval = rrule.INTERVAL || 1;
+        const weekStart = rrule.WKST ?? EWeekday.MONDAY;
+        const byday = rrule.BYDAY ?
+            [...rrule.BYDAY].sort((a, b) => (a.weekday + 7 - weekStart) % 7 - (b.weekday + 7 - weekStart) % 7) : [];
         const bymonthday = rrule.BYMONTHDAY ? [...rrule.BYMONTHDAY] : [];
         const bymonth = rrule.BYMONTH ? [...rrule.BYMONTH] : [];
         const dates: ITimelineEntry[] = [];
@@ -164,17 +166,15 @@ export class Event {
                 break;
             }
             case EFreq.WEEKLY: {
-                const weekStart = rrule.WKST ? rrule.WKST : EWeekday.MONDAY;
                 if (!byday.length) {
                     byday.push({ ordwk: 0, weekday: serieStart.getDay() });
                 }
                 let currentDate = new Date(serieStart.getTime());
-                currentDate.setDate(currentDate.getDate() -
-                    ((currentDate.getDay() < weekStart ? 7 : 0) + currentDate.getDay() - weekStart));
+                currentDate.setDate(currentDate.getDate() - (currentDate.getDay() + 7 - weekStart) % 7);
                 while (isInbound(currentDate) || currentDate < serieStart) {
                     byday.map(r => {
                         const d = new Date(currentDate.getTime());
-                        d.setDate(d.getDate() + r.weekday - weekStart);
+                        d.setDate(d.getDate() + (r.weekday + 7 - weekStart) % 7);
                         return d;
                     }).forEach(r => {
                         if (isInbound(r)) {
@@ -200,7 +200,8 @@ export class Event {
             default:
                 break;
         }
-        return rrule.COUNT && rrule.COUNT < dates.length ? dates.slice(0, rrule.COUNT) : dates;
+        const sorted = dates.sort((a, b) => a.startTime - b.startTime);
+        return rrule.COUNT && rrule.COUNT < dates.length ? sorted.slice(0, rrule.COUNT) : sorted;
     }
 }
 
