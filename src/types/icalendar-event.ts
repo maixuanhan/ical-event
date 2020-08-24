@@ -55,6 +55,9 @@ export class Event {
                 if (rrule.BYSETPOS && rrule.FREQ !== EFreq.MONTHLY && rrule.FREQ !== EFreq.YEARLY) {
                     throw new Error("Invalid rule: BYSETPOS requires MONTHLY or YEARLY freq");
                 }
+                if (rrule.BYMONTH && rrule.BYMONTH.some(r => r < 1 || r > 12)) {
+                    throw new Error("Invalid rule: Invalid BYMONTH value");
+                }
             }
         } catch (ex) {
             const err: Error = ex;
@@ -75,7 +78,7 @@ export class Event {
             }];
         }
         const { rrule, dtstart, dtend, rdate, exdate } = this.event;
-        const { FREQ, BYMONTH, BYWEEKNO, BYYEARDAY, BYMONTHDAY, BYSETPOS, COUNT, UNTIL } = rrule;
+        const { FREQ, COUNT, UNTIL } = rrule;
         const duration = this.event.duration ? this.event.duration : dtend - dtstart;
         const serieStart = new Date(dtstart);
         const serieEnd = new Date(UNTIL ? UNTIL : dtstart + EXPAND_YEAR * 366 * 24 * 60 * 60 * 1000);
@@ -86,6 +89,8 @@ export class Event {
         const bymonthday = rrule.BYMONTHDAY ? [...rrule.BYMONTHDAY] : [];
         const bymonth = rrule.BYMONTH ? [...rrule.BYMONTH] : [];
         const bysetpos = rrule.BYSETPOS ? [...rrule.BYSETPOS] : [];
+        const byyearday = rrule.BYYEARDAY ? [...rrule.BYYEARDAY] : [];
+        const byweekno = rrule.BYWEEKNO ? [...rrule.BYWEEKNO] : [];
         const dates: ITimelineEntry[] = [];
         const pushResult = (startTime: Date): void => {
             dates.push({
@@ -102,6 +107,155 @@ export class Event {
         };
         switch (FREQ) {
             case EFreq.YEARLY: {
+                if (!byday.length && !bymonthday.length && !byyearday.length) {
+                    if (bymonth.length || !byweekno.length) {
+                        bymonthday.push(serieStart.getDate());
+                        if (!bymonth.length) {
+                            bymonth.push(serieStart.getMonth() + 1);
+                        }
+                    } else if (byweekno.length) {
+                        byday.push({ ordwk: 0, weekday: serieStart.getDay() });
+                    }
+                }
+
+                let currentDate = new Date(serieStart.getTime());
+                // move back to first day of the year
+                currentDate.setDate(1);
+                currentDate.setMonth(0);
+                while (currentDate <= serieEnd && isCountNotReached()) {
+                    const fromByMonth: Date[] = [];
+                    const fromByWeekno: Date[] = [];
+                    const fromByyearday: Date[] = [];
+                    let fromByday: Date[] = [];
+
+                    bymonth.forEach(m => {
+                        const monthDates: Date[] = [];
+                        const dayDates: Date[] = [];
+                        const localCurrentDate = new Date(currentDate.getTime());
+                        localCurrentDate.setMonth(m - 1);
+                        bymonthday.map(r => {
+                            const d = new Date(localCurrentDate.getTime());
+                            if (r > 0) {
+                                d.setDate(d.getDate() + r - 1);
+                            } else {
+                                d.setMonth(d.getMonth() + 1);
+                                d.setDate(d.getDate() + r);
+                            }
+                            return d;
+                        }).forEach(r => {
+                            if (isInbound(r) && r.getMonth() === localCurrentDate.getMonth()) {
+                                monthDates.push(r);
+                            }
+                        });
+
+                        byday.forEach(r => {
+                            let d = new Date(localCurrentDate.getTime());
+                            d.setDate(d.getDate() + (r.weekday + 7 - d.getDay()) % 7);
+                            const ds: Date[] = [];
+                            while (d.getMonth() === localCurrentDate.getMonth()) {
+                                ds.push(d);
+                                d = new Date(d.getTime());
+                                d.setDate(d.getDate() + 7);
+                            }
+                            if (!r.ordwk) {
+                                dayDates.push(...ds.filter(dd => isInbound(dd)));
+                            } else if (r.ordwk > 0 && r.ordwk <= ds.length) {
+                                if (isInbound(ds[r.ordwk - 1])) {
+                                    dayDates.push(ds[r.ordwk - 1]);
+                                }
+                            } else if (r.ordwk < 0 && r.ordwk + ds.length >= 0) {
+                                if (isInbound(ds[r.ordwk + ds.length])) {
+                                    dayDates.push(ds[r.ordwk + ds.length]);
+                                }
+                            }
+                        });
+
+                        let intermediateResult: Date[] = [];
+                        if (bymonthday.length && byday.length) {
+                            intermediateResult = findIntersection(monthDates, dayDates);
+                        } else if (bymonthday.length) {
+                            intermediateResult = monthDates;
+                        } else if (byday.length) {
+                            intermediateResult = dayDates;
+                        }
+                        fromByMonth.push(...intermediateResult);
+                    });
+
+                    byweekno.forEach(w => {
+                        const localCurrentDate = new Date(currentDate.getTime());
+                        localCurrentDate.setDate(4);
+                        localCurrentDate.setDate(4 - (localCurrentDate.getDay() + 7 - weekStart) % 7);
+                        if (localCurrentDate.getFullYear() >= 1996 &&
+                            localCurrentDate.getFullYear() < 2000)
+                            localCurrentDate.setDate(localCurrentDate.getDate() + (w - 1) * 7);
+                        fromByWeekno.push(...byday.map(r => {
+                            const d = new Date(localCurrentDate.getTime());
+                            d.setDate(d.getDate() + (r.weekday + 7 - weekStart) % 7);
+                            return d;
+                        }));
+                    });
+
+                    byyearday.forEach(r => {
+                        if (!r) { return; }
+                        const d = new Date(currentDate.getTime());
+                        if (r > 0) {
+                            d.setDate(d.getDate() + r - 1);
+                        } else {
+                            d.setFullYear(d.getFullYear() + 1);
+                            d.setDate(d.getDate() + r);
+                        }
+                        if (isInbound(d) && d.getFullYear() === currentDate.getFullYear()) {
+                            fromByyearday.push(d);
+                        }
+                    });
+
+                    byday.forEach(r => {
+                        if (!r.ordwk) { return; }
+                        const d = new Date(currentDate.getTime());
+                        if (r.ordwk > 0) {
+                            d.setDate(d.getDate() + (r.weekday + 7 - d.getDay()) % 7 + (r.ordwk - 1) * 7);
+                        } else if (r.ordwk < 0) {
+                            d.setFullYear(d.getFullYear() + 1);
+                            d.setDate(d.getDate() + (r.weekday + 7 - d.getDay()) % 7 + r.ordwk * 7);
+                        }
+                        if (d.getFullYear() === currentDate.getFullYear()) {
+                            fromByday.push(d);
+                        }
+                    });
+                    if (bysetpos.length && fromByday.length) {
+                        const newFromByday: Date[] = [];
+                        fromByday.sort((a, b) => a.getTime() - b.getTime());
+                        bysetpos.forEach(r => {
+                            const idx = r > 0 ? r - 1 : r + fromByday.length;
+                            if (0 <= idx && idx < fromByday.length && isInbound(fromByday[idx])) {
+                                newFromByday.push(fromByday[idx]);
+                            }
+                        });
+                        fromByday = newFromByday;
+                    }
+
+                    let list: Date[][] = [];
+                    if (fromByMonth.length) { list.push(fromByMonth); }
+                    if (fromByWeekno.length) { list.push(fromByWeekno); }
+                    if (fromByyearday.length) { list.push(fromByyearday); }
+                    if (fromByday.length) { list.push(fromByday); }
+
+                    let intermediateResult: Date[] = [];
+                    if (list.length === 1) {
+                        intermediateResult = list[0];
+                    } else if (list.length > 1) {
+                        intermediateResult = list.reduce((acc, cur) => findIntersection(acc, cur));
+                    }
+                    intermediateResult.sort((a, b) => a.getTime() - b.getTime());
+                    intermediateResult.forEach(r => {
+                        if (isCountNotReached()) {
+                            pushResult(r);
+                        }
+                    });
+
+                    currentDate = new Date(currentDate.getTime());
+                    currentDate.setFullYear(currentDate.getFullYear() + interval);
+                }
                 break;
             }
             case EFreq.MONTHLY: {
@@ -113,8 +267,8 @@ export class Event {
                 // move back to first day of the month
                 currentDate.setDate(1);
                 while (currentDate <= serieEnd && isCountNotReached()) {
-                    const monthDates: Date[] = [];
-                    const dayDates: Date[] = [];
+                    const fromBymonthday: Date[] = [];
+                    let fromByday: Date[] = [];
                     bymonthday.map(r => {
                         const d = new Date(currentDate.getTime());
                         if (r > 0) {
@@ -126,7 +280,7 @@ export class Event {
                         return d;
                     }).forEach(r => {
                         if (isInbound(r) && r.getMonth() === currentDate.getMonth()) {
-                            monthDates.push(r);
+                            fromBymonthday.push(r);
                         }
                     });
 
@@ -140,37 +294,39 @@ export class Event {
                             d.setDate(d.getDate() + 7);
                         }
                         if (!r.ordwk) {
-                            dayDates.push(...ds);
+                            fromByday.push(...ds);
                         } else if (r.ordwk > 0 && r.ordwk <= ds.length) {
-                            dayDates.push(ds[r.ordwk - 1]);
+                            fromByday.push(ds[r.ordwk - 1]);
                         } else if (r.ordwk < 0 && r.ordwk + ds.length >= 0) {
-                            dayDates.push(ds[r.ordwk + ds.length]);
+                            fromByday.push(ds[r.ordwk + ds.length]);
                         }
                     });
+                    if (bysetpos.length && fromByday.length) {
+                        const newFromByday: Date[] = [];
+                        fromByday.sort((a, b) => a.getTime() - b.getTime());
+                        bysetpos.forEach(r => {
+                            const idx = r > 0 ? r - 1 : r + fromByday.length;
+                            if (0 <= idx && idx < fromByday.length && isInbound(fromByday[idx])) {
+                                newFromByday.push(fromByday[idx]);
+                            }
+                        });
+                        fromByday = newFromByday;
+                    }
 
                     let intermediateResult: Date[] = [];
                     if (bymonthday.length && byday.length) {
-                        intermediateResult = findIntersection(monthDates, dayDates);
+                        intermediateResult = findIntersection(fromBymonthday, fromByday);
                     } else if (bymonthday.length) {
-                        intermediateResult = monthDates;
+                        intermediateResult = fromBymonthday;
                     } else if (byday.length) {
-                        intermediateResult = dayDates;
+                        intermediateResult = fromByday;
                     }
                     intermediateResult.sort((a, b) => a.getTime() - b.getTime());
-                    if (bysetpos.length) {
-                        bysetpos.forEach(r => {
-                            const idx = r > 0 ? r - 1 : r + intermediateResult.length;
-                            if (0 <= idx && idx < intermediateResult.length && isCountNotReached()) {
-                                pushResult(intermediateResult[idx]);
-                            }
-                        });
-                    } else {
-                        intermediateResult.forEach(r => {
-                            if (isCountNotReached()) {
-                                pushResult(r);
-                            }
-                        });
-                    }
+                    intermediateResult.forEach(r => {
+                        if (isCountNotReached()) {
+                            pushResult(r);
+                        }
+                    });
 
                     currentDate = new Date(currentDate.getTime());
                     currentDate.setMonth(currentDate.getMonth() + interval);
@@ -213,6 +369,6 @@ export class Event {
                 break;
         }
         const sorted = dates.sort((a, b) => a.startTime - b.startTime);
-        return rrule.COUNT && rrule.COUNT < dates.length ? sorted.slice(0, rrule.COUNT) : sorted;
+        return rrule.COUNT && rrule.COUNT < sorted.length ? sorted.slice(0, rrule.COUNT) : sorted;
     }
 }

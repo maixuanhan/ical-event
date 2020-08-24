@@ -209,10 +209,57 @@ describe("Parser tests", () => {
         expect(rule).to.deep.equal(expectedRule);
     });
 
-    // it("Helper.parseRrule('')", () => {
-    //     const rule = helper.parseRrule("");
-    //     const expectedRule: IRecurrenceRule = {
-    //     };
-    //     expect(rule).to.deep.equal(expectedRule);
-    // });
+    it("Helper.parseRrule('RRULE:FREQ=YEARLY;UNTIL=20000131T140000Z;BYMONTH=1;BYDAY=SU,MO,TU,WE,TH,FR,SA')", () => {
+        const rule = helper.parseRrule("RRULE:FREQ=YEARLY;UNTIL=20000131T140000Z;BYMONTH=1;BYDAY=SU,MO,TU,WE,TH,FR,SA");
+        const expectedRule: IRecurrenceRule = {
+            FREQ: EFreq.YEARLY,
+            UNTIL: new Date(2000, 0, 31, 22, 0, 0).getTime(),
+            BYMONTH: [1],
+            BYDAY: [
+                { ordwk: 0, weekday: EWeekday.SUNDAY },
+                { ordwk: 0, weekday: EWeekday.MONDAY },
+                { ordwk: 0, weekday: EWeekday.TUESDAY },
+                { ordwk: 0, weekday: EWeekday.WEDNESDAY },
+                { ordwk: 0, weekday: EWeekday.THURSDAY },
+                { ordwk: 0, weekday: EWeekday.FRIDAY },
+                { ordwk: 0, weekday: EWeekday.SATURDAY },
+            ],
+        };
+        expect(rule).to.deep.equal(expectedRule);
+    });
+
+    it("Helper.parseRrule('RRULE:FREQ=YEARLY;COUNT=10;BYMONTH=6,7')", () => {
+        const rule = helper.parseRrule("RRULE:FREQ=YEARLY;COUNT=10;BYMONTH=6,7");
+        const expectedRule: IRecurrenceRule = {
+            FREQ: EFreq.YEARLY,
+            COUNT: 10,
+            BYMONTH: [6, 7],
+        };
+        expect(rule).to.deep.equal(expectedRule);
+    });
+
+    it("Helper.parseRrule('RRULE:FREQ=YEARLY;INTERVAL=2;COUNT=10;BYMONTH=1,2,3')", () => {
+        const rule = helper.parseRrule("RRULE:FREQ=YEARLY;INTERVAL=2;COUNT=10;BYMONTH=1,2,3");
+        const expectedRule: IRecurrenceRule = {
+            FREQ: EFreq.YEARLY,
+            INTERVAL: 2,
+            COUNT: 10,
+            BYMONTH: [1, 2, 3],
+        };
+        expect(rule).to.deep.equal(expectedRule);
+    });
+
+    it("Helper.parseRrule('RRULE:FREQ=YEARLY;INTERVAL=4;BYMONTH=11;BYDAY=TU;BYMONTHDAY=2,3,4,5,6,7,8')", () => {
+        const rule = helper.parseRrule("RRULE:FREQ=YEARLY;INTERVAL=4;BYMONTH=11;BYDAY=TU;BYMONTHDAY=2,3,4,5,6,7,8");
+        const expectedRule: IRecurrenceRule = {
+            FREQ: EFreq.YEARLY,
+            INTERVAL: 4,
+            BYMONTH: [11],
+            BYDAY: [
+                { ordwk: 0, weekday: EWeekday.TUESDAY },
+            ],
+            BYMONTHDAY: [2, 3, 4, 5, 6, 7, 8],
+        };
+        expect(rule).to.deep.equal(expectedRule);
+    });
 });
