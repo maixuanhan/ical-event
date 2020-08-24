@@ -234,7 +234,7 @@ export class Event {
                         fromByday = newFromByday;
                     }
 
-                    let list: Date[][] = [];
+                    const list: Date[][] = [];
                     if (fromByMonth.length) { list.push(fromByMonth); }
                     if (fromByWeekno.length) { list.push(fromByWeekno); }
                     if (fromByyearday.length) { list.push(fromByyearday); }
