@@ -1,7 +1,10 @@
-import { Event } from "../src/ical-helper";
-import { expect, should } from "chai";
+import { Event } from "../src/types/icalendar-event";
+import { Helper } from "../src/icalendar-helper";
+import { expect } from "chai";
 import "mocha";
-import { EEventType, EFreq, EWeekday } from "../src/types/icalendar.types";
+import { EEventType } from "../src/types/icalendar.types";
+
+const helper = new Helper();
 
 describe("rrule DAILY freq", () => {
     // Daily for 10 occurrences:
@@ -11,6 +14,14 @@ describe("rrule DAILY freq", () => {
 
     // ==> (1997 9:00 AM EDT) September 2-11
     it("RRULE:FREQ=DAILY;COUNT=10", () => {
+        const event = new Event({
+            uid: "daily1",
+            dtstart: helper.parseDateOrDateTime("19970902T090000"),
+            duration: 30 * 60 * 1000,
+            type: EEventType.RECURRINGMASTER,
+            rrule: helper.parseRrule("RRULE:FREQ=DAILY;COUNT=10"),
+        });
+        const result = event.expandTimelines();
         const resList = [
             new Date(1997, 8, 2, 9, 0, 0),
             new Date(1997, 8, 3, 9, 0, 0),
@@ -23,17 +34,6 @@ describe("rrule DAILY freq", () => {
             new Date(1997, 8, 10, 9, 0, 0),
             new Date(1997, 8, 11, 9, 0, 0),
         ];
-        const event = new Event({
-            uid: "daily1",
-            dtstart: new Date(1997, 8, 2, 9, 0, 0).getTime(),
-            duration: 30 * 60 * 1000,
-            type: EEventType.RECURRINGMASTER,
-            rrule: {
-                FREQ: EFreq.DAILY,
-                COUNT: 10,
-            },
-        });
-        const result = event.expandTimelines();
         expect(result, "Number of occurrences").length(resList.length);
         result.forEach(r => {
             expect(resList.some(s => s.getTime() === r.startTime), `Instance values: ${new Date(r.startTime)}`).be.true;
@@ -48,6 +48,14 @@ describe("rrule DAILY freq", () => {
     // ==> (1997 9:00 AM EDT) September 2-30;October 1-25
     //     (1997 9:00 AM EST) October 26-31;November 1-30;December 1-23
     it("RRULE:FREQ=DAILY;UNTIL=19971224T000000Z", () => {
+        const event = new Event({
+            uid: "daily2",
+            dtstart: helper.parseDateOrDateTime("19970902T090000"),
+            duration: 30 * 60 * 1000,
+            type: EEventType.RECURRINGMASTER,
+            rrule: helper.parseRrule("RRULE:FREQ=DAILY;UNTIL=19971224T000000Z"),
+        });
+        const result = event.expandTimelines();
         const resList = [
             {
                 start: new Date(1997, 8, 2, 9, 0, 0),
@@ -70,17 +78,6 @@ describe("rrule DAILY freq", () => {
                 end: new Date(1997, 11, 23, 9, 0, 0),
             },
         ];
-        const event = new Event({
-            uid: "daily2",
-            dtstart: new Date(1997, 8, 2, 9, 0, 0).getTime(),
-            duration: 30 * 60 * 1000,
-            type: EEventType.RECURRINGMASTER,
-            rrule: {
-                FREQ: EFreq.DAILY,
-                UNTIL: new Date(1997, 11, 24, 8, 0, 0).getTime(),
-            },
-        });
-        const result = event.expandTimelines();
         expect(result, "Number of occurrences").length(30 - 2 + 1 + 25 - 1 + 1 + 31 - 26 + 1 + 30 - 1 + 1 + 23 - 1 + 1);
         expect(result.every(r => resList.some(s => s.start.getTime() <= r.startTime && r.startTime <= s.end.getTime())),
             "Instance values").be.true;
@@ -99,13 +96,10 @@ describe("rrule DAILY freq", () => {
     it("RRULE:FREQ=DAILY;INTERVAL=2", () => {
         const event = new Event({
             uid: "daily3",
-            dtstart: new Date(1997, 8, 2, 9, 0, 0).getTime(),
+            dtstart: helper.parseDateOrDateTime("19970902T090000"),
             duration: 30 * 60 * 1000,
             type: EEventType.RECURRINGMASTER,
-            rrule: {
-                FREQ: EFreq.DAILY,
-                INTERVAL: 2,
-            },
+            rrule: helper.parseRrule("RRULE:FREQ=DAILY;INTERVAL=2"),
         });
         const result = event.expandTimelines();
         expect(result.length > 60, "Number of occurrences").be.true;
@@ -130,6 +124,14 @@ describe("rrule DAILY freq", () => {
     // ==> (1997 9:00 AM EDT) September 2,12,22;
     //                        October 2,12
     it("RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5", () => {
+        const event = new Event({
+            uid: "daily4",
+            dtstart: helper.parseDateOrDateTime("19970902T090000"),
+            duration: 30 * 60 * 1000,
+            type: EEventType.RECURRINGMASTER,
+            rrule: helper.parseRrule("RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5"),
+        });
+        const result = event.expandTimelines();
         const resList = [
             new Date(1997, 8, 2, 9, 0, 0),
             new Date(1997, 8, 12, 9, 0, 0),
@@ -137,18 +139,6 @@ describe("rrule DAILY freq", () => {
             new Date(1997, 9, 2, 9, 0, 0),
             new Date(1997, 9, 12, 9, 0, 0),
         ];
-        const event = new Event({
-            uid: "daily4",
-            dtstart: new Date(1997, 8, 2, 9, 0, 0).getTime(),
-            duration: 30 * 60 * 1000,
-            type: EEventType.RECURRINGMASTER,
-            rrule: {
-                FREQ: EFreq.DAILY,
-                INTERVAL: 10,
-                COUNT: 5,
-            },
-        });
-        const result = event.expandTimelines();
         expect(result, "Number of occurrences").length(resList.length);
         result.forEach(r => {
             expect(resList.some(s => s.getTime() === r.startTime), `Instance values: ${new Date(r.startTime)}`).be.true;
@@ -168,6 +158,14 @@ describe("rrule DAILY freq", () => {
     //     (1999 9:00 AM EST)January 1-31
     //     (2000 9:00 AM EST)January 1-31
     it("RRULE:FREQ=DAILY;UNTIL=20000131T140000Z;BYMONTH=1", () => {
+        const event = new Event({
+            uid: "daily5",
+            dtstart: helper.parseDateOrDateTime("19980101T090000"),
+            duration: 30 * 60 * 1000,
+            type: EEventType.RECURRINGMASTER,
+            rrule: helper.parseRrule("RRULE:FREQ=DAILY;UNTIL=20000131T140000Z;BYMONTH=1"),
+        });
+        const result = event.expandTimelines();
         const resList = [
             {
                 start: new Date(1998, 0, 1, 9, 0, 0),
@@ -182,18 +180,6 @@ describe("rrule DAILY freq", () => {
                 end: new Date(2000, 0, 31, 9, 0, 0),
             },
         ];
-        const event = new Event({
-            uid: "daily5",
-            dtstart: new Date(1998, 0, 1, 9, 0, 0).getTime(),
-            duration: 30 * 60 * 1000,
-            type: EEventType.RECURRINGMASTER,
-            rrule: {
-                FREQ: EFreq.DAILY,
-                UNTIL: new Date(2000, 0, 31, 22, 0, 0).getTime(),
-                BYMONTH: [1],
-            },
-        });
-        const result = event.expandTimelines();
         expect(result, "Number of occurrences").length((31 - 1 + 1) * 3);
         expect(result.every(r => resList.some(s => s.start.getTime() <= r.startTime && r.startTime <= s.end.getTime())),
             "Instance values").be.true;

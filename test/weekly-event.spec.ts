@@ -1,7 +1,10 @@
-import { Event } from "../src/ical-helper";
-import { expect, should } from "chai";
+import { Event } from "../src/types/icalendar-event";
+import { expect } from "chai";
 import "mocha";
-import { EEventType, EFreq, EWeekday } from "../src/types/icalendar.types";
+import { EEventType } from "../src/types/icalendar.types";
+import { Helper } from "../src/icalendar-helper";
+
+const helper = new Helper();
 
 describe("rrule WEEKLY freq", () => {
     // Weekly for 10 occurrences:
@@ -14,13 +17,10 @@ describe("rrule WEEKLY freq", () => {
     it("RRULE:FREQ=WEEKLY;COUNT=10", () => {
         const event = new Event({
             uid: "weekly1",
-            dtstart: new Date(1997, 8, 2, 9, 0, 0).getTime(),
+            dtstart: helper.parseDateOrDateTime("19970902T090000"),
             duration: 30 * 60 * 1000,
             type: EEventType.RECURRINGMASTER,
-            rrule: {
-                FREQ: EFreq.WEEKLY,
-                COUNT: 10,
-            },
+            rrule: helper.parseRrule("RRULE:FREQ=WEEKLY;COUNT=10"),
         });
         const result = event.expandTimelines();
         const resList = [
@@ -54,13 +54,10 @@ describe("rrule WEEKLY freq", () => {
     it("RRULE:FREQ=WEEKLY;UNTIL=19971224T000000Z", () => {
         const event = new Event({
             uid: "weekly2",
-            dtstart: new Date(1997, 8, 2, 9, 0, 0).getTime(),
+            dtstart: helper.parseDateOrDateTime("19970902T090000"),
             duration: 30 * 60 * 1000,
             type: EEventType.RECURRINGMASTER,
-            rrule: {
-                FREQ: EFreq.WEEKLY,
-                UNTIL: new Date(1997, 11, 24, 8, 0, 0).getTime(),
-            },
+            rrule: helper.parseRrule("RRULE:FREQ=WEEKLY;UNTIL=19971224T000000Z"),
         });
         const result = event.expandTimelines();
         const resList = [
@@ -104,14 +101,10 @@ describe("rrule WEEKLY freq", () => {
     it("RRULE:FREQ=WEEKLY;INTERVAL=2;WKST=SU", () => {
         const event = new Event({
             uid: "weekly3",
-            dtstart: new Date(1997, 8, 2, 9, 0, 0).getTime(),
+            dtstart: helper.parseDateOrDateTime("19970902T090000"),
             duration: 30 * 60 * 1000,
             type: EEventType.RECURRINGMASTER,
-            rrule: {
-                FREQ: EFreq.WEEKLY,
-                INTERVAL: 2,
-                WKST: EWeekday.SUNDAY,
-            },
+            rrule: helper.parseRrule("RRULE:FREQ=WEEKLY;INTERVAL=2;WKST=SU"),
         });
         const result = event.expandTimelines();
         expect(result.length > 13, "Number of occurrences").be.true;
@@ -149,18 +142,10 @@ describe("rrule WEEKLY freq", () => {
     it("RRULE:FREQ=WEEKLY;UNTIL=19971007T000000Z;WKST=SU;BYDAY=TU,TH", () => {
         const event = new Event({
             uid: "weekly4",
-            dtstart: new Date(1997, 8, 2, 9, 0, 0).getTime(),
+            dtstart: helper.parseDateOrDateTime("19970902T090000"),
             duration: 30 * 60 * 1000,
             type: EEventType.RECURRINGMASTER,
-            rrule: {
-                FREQ: EFreq.WEEKLY,
-                UNTIL: new Date(1997, 9, 7, 8, 0, 0).getTime(),
-                WKST: EWeekday.SUNDAY,
-                BYDAY: [
-                    { ordwk: 0, weekday: EWeekday.TUESDAY },
-                    { ordwk: 0, weekday: EWeekday.THURSDAY },
-                ],
-            },
+            rrule: helper.parseRrule("RRULE:FREQ=WEEKLY;UNTIL=19971007T000000Z;WKST=SU;BYDAY=TU,TH"),
         });
         const result = event.expandTimelines();
         const resList = [
@@ -183,18 +168,10 @@ describe("rrule WEEKLY freq", () => {
     it("RRULE:FREQ=WEEKLY;COUNT=10;WKST=SU;BYDAY=TU,TH", () => {
         const event = new Event({
             uid: "weekly5",
-            dtstart: new Date(1997, 8, 2, 9, 0, 0).getTime(),
+            dtstart: helper.parseDateOrDateTime("19970902T090000"),
             duration: 30 * 60 * 1000,
             type: EEventType.RECURRINGMASTER,
-            rrule: {
-                FREQ: EFreq.WEEKLY,
-                COUNT: 10,
-                WKST: EWeekday.SUNDAY,
-                BYDAY: [
-                    { ordwk: 0, weekday: EWeekday.TUESDAY },
-                    { ordwk: 0, weekday: EWeekday.THURSDAY },
-                ],
-            },
+            rrule: helper.parseRrule("RRULE:FREQ=WEEKLY;COUNT=10;WKST=SU;BYDAY=TU,TH"),
         });
         const result = event.expandTimelines();
         const resList = [
@@ -230,20 +207,10 @@ describe("rrule WEEKLY freq", () => {
     it("RRULE:FREQ=WEEKLY;INTERVAL=2;UNTIL=19971224T000000Z;WKST=SU;BYDAY=MO,WE,FR", () => {
         const event = new Event({
             uid: "weekly6",
-            dtstart: new Date(1997, 8, 1, 9, 0, 0).getTime(),
+            dtstart: helper.parseDateOrDateTime("19970901T090000"),
             duration: 30 * 60 * 1000,
             type: EEventType.RECURRINGMASTER,
-            rrule: {
-                FREQ: EFreq.WEEKLY,
-                INTERVAL: 2,
-                UNTIL: new Date(1997, 11, 24, 8, 0, 0).getTime(),
-                WKST: EWeekday.SUNDAY,
-                BYDAY: [
-                    { ordwk: 0, weekday: EWeekday.MONDAY },
-                    { ordwk: 0, weekday: EWeekday.WEDNESDAY },
-                    { ordwk: 0, weekday: EWeekday.FRIDAY },
-                ],
-            },
+            rrule: helper.parseRrule("RRULE:FREQ=WEEKLY;INTERVAL=2;UNTIL=19971224T000000Z;WKST=SU;BYDAY=MO,WE,FR"),
         });
         const result = event.expandTimelines();
         const resList = [
@@ -289,19 +256,10 @@ describe("rrule WEEKLY freq", () => {
     it("RRULE:FREQ=WEEKLY;INTERVAL=2;COUNT=8;WKST=SU;BYDAY=TU,TH", () => {
         const event = new Event({
             uid: "weekly7",
-            dtstart: new Date(1997, 8, 2, 9, 0, 0).getTime(),
+            dtstart: helper.parseDateOrDateTime("19970902T090000"),
             duration: 30 * 60 * 1000,
             type: EEventType.RECURRINGMASTER,
-            rrule: {
-                FREQ: EFreq.WEEKLY,
-                INTERVAL: 2,
-                COUNT: 8,
-                WKST: EWeekday.SUNDAY,
-                BYDAY: [
-                    { ordwk: 0, weekday: EWeekday.TUESDAY },
-                    { ordwk: 0, weekday: EWeekday.THURSDAY },
-                ],
-            },
+            rrule: helper.parseRrule("RRULE:FREQ=WEEKLY;INTERVAL=2;COUNT=8;WKST=SU;BYDAY=TU,TH"),
         });
         const result = event.expandTimelines();
         const resList = [
@@ -330,19 +288,10 @@ describe("rrule WEEKLY freq", () => {
     it("RRULE:FREQ=WEEKLY;INTERVAL=2;COUNT=4;BYDAY=TU,SU;WKST=MO", () => {
         const event = new Event({
             uid: "weekly8",
-            dtstart: new Date(1997, 7, 5, 9, 0, 0).getTime(),
+            dtstart: helper.parseDateOrDateTime("19970805T090000"),
             duration: 30 * 60 * 1000,
             type: EEventType.RECURRINGMASTER,
-            rrule: {
-                FREQ: EFreq.WEEKLY,
-                INTERVAL: 2,
-                COUNT: 4,
-                BYDAY: [
-                    { ordwk: 0, weekday: EWeekday.TUESDAY },
-                    { ordwk: 0, weekday: EWeekday.SUNDAY },
-                ],
-                WKST: EWeekday.MONDAY,
-            },
+            rrule: helper.parseRrule("RRULE:FREQ=WEEKLY;INTERVAL=2;COUNT=4;BYDAY=TU,SU;WKST=MO"),
         });
         const result = event.expandTimelines();
         const resList = [
@@ -366,19 +315,10 @@ describe("rrule WEEKLY freq", () => {
     it("RRULE:FREQ=WEEKLY;INTERVAL=2;COUNT=4;BYDAY=TU,SU;WKST=SU", () => {
         const event = new Event({
             uid: "weekly8",
-            dtstart: new Date(1997, 7, 5, 9, 0, 0).getTime(),
+            dtstart: helper.parseDateOrDateTime("19970805T090000"),
             duration: 30 * 60 * 1000,
             type: EEventType.RECURRINGMASTER,
-            rrule: {
-                FREQ: EFreq.WEEKLY,
-                INTERVAL: 2,
-                COUNT: 4,
-                BYDAY: [
-                    { ordwk: 0, weekday: EWeekday.TUESDAY },
-                    { ordwk: 0, weekday: EWeekday.SUNDAY },
-                ],
-                WKST: EWeekday.SUNDAY,
-            },
+            rrule: helper.parseRrule("RRULE:FREQ=WEEKLY;INTERVAL=2;COUNT=4;BYDAY=TU,SU;WKST=SU"),
         });
         const result = event.expandTimelines();
         const resList = [

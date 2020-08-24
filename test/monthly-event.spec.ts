@@ -1,5 +1,5 @@
-import { Event } from "../src/ical-helper";
-import { expect, should } from "chai";
+import { Event } from "../src/types/icalendar-event";
+import { expect } from "chai";
 import "mocha";
 import { EEventType, EFreq, EWeekday } from "../src/types/icalendar.types";
 

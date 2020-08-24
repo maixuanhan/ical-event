@@ -1,5 +1,4 @@
-// tslint:disable:max-classes-per-file
-import { IEvent, EEventType, EFreq, ITimelineEntry, EWeekday } from "./types/icalendar.types";
+import { IEvent, EEventType, EFreq, ITimelineEntry, EWeekday } from "./icalendar.types";
 
 const EXPAND_YEAR = 100;
 
@@ -202,10 +201,5 @@ export class Event {
         }
         const sorted = dates.sort((a, b) => a.startTime - b.startTime);
         return rrule.COUNT && rrule.COUNT < dates.length ? sorted.slice(0, rrule.COUNT) : sorted;
-    }
-}
-
-export class ICalendarHelper {
-    constructor(private events: IEvent[]) {
     }
 }
