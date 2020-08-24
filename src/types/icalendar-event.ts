@@ -94,7 +94,10 @@ export class Event {
             });
         };
         const isInbound = (date: Date): boolean => {
-            return date >= serieStart && date <= serieEnd && (!COUNT || dates.length < COUNT);
+            return date >= serieStart && date <= serieEnd;
+        };
+        const isCountNotReached = (): boolean => {
+            return !COUNT || dates.length < COUNT;
         };
         switch (FREQ) {
             case EFreq.YEARLY: {
@@ -170,13 +173,13 @@ export class Event {
                 }
                 let currentDate = new Date(serieStart.getTime());
                 currentDate.setDate(currentDate.getDate() - (currentDate.getDay() + 7 - weekStart) % 7);
-                while (isInbound(currentDate) || currentDate < serieStart) {
+                while ((isInbound(currentDate) || currentDate < serieStart) && isCountNotReached()) {
                     byday.map(r => {
                         const d = new Date(currentDate.getTime());
                         d.setDate(d.getDate() + (r.weekday + 7 - weekStart) % 7);
                         return d;
                     }).forEach(r => {
-                        if (isInbound(r)) {
+                        if (isInbound(r) && isCountNotReached()) {
                             pushResult(r);
                         }
                     });
@@ -187,7 +190,7 @@ export class Event {
             }
             case EFreq.DAILY: {
                 let currentDate = new Date(serieStart.getTime());
-                while (isInbound(currentDate)) {
+                while (isInbound(currentDate) && isCountNotReached()) {
                     if (!bymonth.length || bymonth.some(r => currentDate.getMonth() + 1 === r)) {
                         pushResult(currentDate);
                     }
