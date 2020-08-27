@@ -185,9 +185,7 @@ export class Event {
                         const localCurrentDate = new Date(currentDate.getTime());
                         localCurrentDate.setDate(4);
                         localCurrentDate.setDate(4 - (localCurrentDate.getDay() + 7 - weekStart) % 7);
-                        if (localCurrentDate.getFullYear() >= 1996 &&
-                            localCurrentDate.getFullYear() < 2000)
-                            localCurrentDate.setDate(localCurrentDate.getDate() + (w - 1) * 7);
+                        localCurrentDate.setDate(localCurrentDate.getDate() + (w - 1) * 7);
                         fromByWeekno.push(...byday.map(r => {
                             const d = new Date(localCurrentDate.getTime());
                             d.setDate(d.getDate() + (r.weekday + 7 - weekStart) % 7);
