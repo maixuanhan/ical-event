@@ -21,7 +21,7 @@ describe("rrule DAILY freq", () => {
             type: EEventType.RECURRINGMASTER,
             rrule: helper.parseRrule("RRULE:FREQ=DAILY;COUNT=10"),
         });
-        const result = event.expandTimelines();
+        const result = event.expandRrule();
         const resList = [
             new Date(1997, 8, 2, 9, 0, 0),
             new Date(1997, 8, 3, 9, 0, 0),
@@ -55,7 +55,7 @@ describe("rrule DAILY freq", () => {
             type: EEventType.RECURRINGMASTER,
             rrule: helper.parseRrule("RRULE:FREQ=DAILY;UNTIL=19971224T000000Z"),
         });
-        const result = event.expandTimelines();
+        const result = event.expandRrule();
         const resList = [
             {
                 start: new Date(1997, 8, 2, 9, 0, 0),
@@ -101,7 +101,7 @@ describe("rrule DAILY freq", () => {
             type: EEventType.RECURRINGMASTER,
             rrule: helper.parseRrule("RRULE:FREQ=DAILY;INTERVAL=2"),
         });
-        const result = event.expandTimelines();
+        const result = event.expandRrule();
         expect(result.length > 60, "Number of occurrences").be.true;
         const data1997 = result.filter(r => new Date(r.startTime).getFullYear() === 1997);
         expect(data1997.filter(r => new Date(r.startTime).getMonth() === 8),
@@ -131,7 +131,7 @@ describe("rrule DAILY freq", () => {
             type: EEventType.RECURRINGMASTER,
             rrule: helper.parseRrule("RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5"),
         });
-        const result = event.expandTimelines();
+        const result = event.expandRrule();
         const resList = [
             new Date(1997, 8, 2, 9, 0, 0),
             new Date(1997, 8, 12, 9, 0, 0),
@@ -165,7 +165,7 @@ describe("rrule DAILY freq", () => {
             type: EEventType.RECURRINGMASTER,
             rrule: helper.parseRrule("RRULE:FREQ=DAILY;UNTIL=20000131T140000Z;BYMONTH=1"),
         });
-        const result = event.expandTimelines();
+        const result = event.expandRrule();
         const resList = [
             {
                 start: new Date(1998, 0, 1, 9, 0, 0),

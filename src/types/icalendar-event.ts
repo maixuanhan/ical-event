@@ -69,7 +69,7 @@ export class Event {
         return { success: true };
     }
 
-    public expandTimelines(): ITimelineEntry[] {
+    public expandRrule(): ITimelineEntry[] {
         if (this.event.type !== EEventType.RECURRINGMASTER) {
             return [{
                 event: this.event,
@@ -369,4 +369,7 @@ export class Event {
         const sorted = dates.sort((a, b) => a.startTime - b.startTime);
         return rrule.COUNT && rrule.COUNT < sorted.length ? sorted.slice(0, rrule.COUNT) : sorted;
     }
+
+    // public expandTimelines(): ITimelineEntry[] {
+    // }
 }

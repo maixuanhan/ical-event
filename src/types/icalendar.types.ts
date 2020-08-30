@@ -44,6 +44,12 @@ export interface IRecurrenceRule {
     WKST?: EWeekday;
 }
 
+export interface ITimelineEntry {
+    event: IEvent;
+    startTime: TimestampMs;
+    endTime: TimestampMs;
+}
+
 export interface IEvent {
     uid: string;
     oridtstart?: TimestampMs;
@@ -57,11 +63,5 @@ export interface IEvent {
     rrule?: IRecurrenceRule;
     attendee?: string[];
     exdate?: TimestampMs[];
-    rdate?: TimestampMs[];
-}
-
-export interface ITimelineEntry {
-    event: IEvent;
-    startTime: TimestampMs;
-    endTime: TimestampMs;
+    rdate?: ITimelineEntry[];
 }

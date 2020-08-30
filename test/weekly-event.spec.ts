@@ -22,7 +22,7 @@ describe("rrule WEEKLY freq", () => {
             type: EEventType.RECURRINGMASTER,
             rrule: helper.parseRrule("RRULE:FREQ=WEEKLY;COUNT=10"),
         });
-        const result = event.expandTimelines();
+        const result = event.expandRrule();
         const resList = [
             new Date(1997, 8, 2, 9, 0, 0),
             new Date(1997, 8, 9, 9, 0, 0),
@@ -59,7 +59,7 @@ describe("rrule WEEKLY freq", () => {
             type: EEventType.RECURRINGMASTER,
             rrule: helper.parseRrule("RRULE:FREQ=WEEKLY;UNTIL=19971224T000000Z"),
         });
-        const result = event.expandTimelines();
+        const result = event.expandRrule();
         const resList = [
             new Date(1997, 8, 2, 9, 0, 0),
             new Date(1997, 8, 9, 9, 0, 0),
@@ -106,7 +106,7 @@ describe("rrule WEEKLY freq", () => {
             type: EEventType.RECURRINGMASTER,
             rrule: helper.parseRrule("RRULE:FREQ=WEEKLY;INTERVAL=2;WKST=SU"),
         });
-        const result = event.expandTimelines();
+        const result = event.expandRrule();
         expect(result.length > 13, "Number of occurrences").be.true;
         const resList = [
             new Date(1997, 8, 2, 9, 0, 0),
@@ -147,7 +147,7 @@ describe("rrule WEEKLY freq", () => {
             type: EEventType.RECURRINGMASTER,
             rrule: helper.parseRrule("RRULE:FREQ=WEEKLY;UNTIL=19971007T000000Z;WKST=SU;BYDAY=TU,TH"),
         });
-        const result = event.expandTimelines();
+        const result = event.expandRrule();
         const resList = [
             new Date(1997, 8, 2, 9, 0, 0),
             new Date(1997, 8, 4, 9, 0, 0),
@@ -173,7 +173,7 @@ describe("rrule WEEKLY freq", () => {
             type: EEventType.RECURRINGMASTER,
             rrule: helper.parseRrule("RRULE:FREQ=WEEKLY;COUNT=10;WKST=SU;BYDAY=TU,TH"),
         });
-        const result = event.expandTimelines();
+        const result = event.expandRrule();
         const resList = [
             new Date(1997, 8, 2, 9, 0, 0),
             new Date(1997, 8, 4, 9, 0, 0),
@@ -212,7 +212,7 @@ describe("rrule WEEKLY freq", () => {
             type: EEventType.RECURRINGMASTER,
             rrule: helper.parseRrule("RRULE:FREQ=WEEKLY;INTERVAL=2;UNTIL=19971224T000000Z;WKST=SU;BYDAY=MO,WE,FR"),
         });
-        const result = event.expandTimelines();
+        const result = event.expandRrule();
         const resList = [
             new Date(1997, 8, 1, 9, 0, 0),
             new Date(1997, 8, 3, 9, 0, 0),
@@ -261,7 +261,7 @@ describe("rrule WEEKLY freq", () => {
             type: EEventType.RECURRINGMASTER,
             rrule: helper.parseRrule("RRULE:FREQ=WEEKLY;INTERVAL=2;COUNT=8;WKST=SU;BYDAY=TU,TH"),
         });
-        const result = event.expandTimelines();
+        const result = event.expandRrule();
         const resList = [
             new Date(1997, 8, 2, 9, 0, 0),
             new Date(1997, 8, 4, 9, 0, 0),
@@ -293,7 +293,7 @@ describe("rrule WEEKLY freq", () => {
             type: EEventType.RECURRINGMASTER,
             rrule: helper.parseRrule("RRULE:FREQ=WEEKLY;INTERVAL=2;COUNT=4;BYDAY=TU,SU;WKST=MO"),
         });
-        const result = event.expandTimelines();
+        const result = event.expandRrule();
         const resList = [
             new Date(1997, 7, 5, 9, 0, 0),
             new Date(1997, 7, 10, 9, 0, 0),
@@ -320,7 +320,7 @@ describe("rrule WEEKLY freq", () => {
             type: EEventType.RECURRINGMASTER,
             rrule: helper.parseRrule("RRULE:FREQ=WEEKLY;INTERVAL=2;COUNT=4;BYDAY=TU,SU;WKST=SU"),
         });
-        const result = event.expandTimelines();
+        const result = event.expandRrule();
         const resList = [
             new Date(1997, 7, 5, 9, 0, 0),
             new Date(1997, 7, 17, 9, 0, 0),

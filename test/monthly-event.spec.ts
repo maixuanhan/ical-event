@@ -27,7 +27,7 @@ describe("rrule MONTHLY freq", () => {
                 ],
             },
         });
-        const result = event.expandTimelines();
+        const result = event.expandRrule();
         const resList = [
             new Date(1997, 8, 5, 9, 0, 0),
             new Date(1997, 9, 3, 9, 0, 0),
@@ -67,7 +67,7 @@ describe("rrule MONTHLY freq", () => {
                 ],
             },
         });
-        const result = event.expandTimelines();
+        const result = event.expandRrule();
         const resList = [
             new Date(1997, 8, 5, 9, 0, 0),
             new Date(1997, 9, 3, 9, 0, 0),
@@ -106,7 +106,7 @@ describe("rrule MONTHLY freq", () => {
                 ],
             },
         });
-        const result = event.expandTimelines();
+        const result = event.expandRrule();
         const resList = [
             new Date(1997, 8, 7, 9, 0, 0),
             new Date(1997, 8, 28, 9, 0, 0),
@@ -147,7 +147,7 @@ describe("rrule MONTHLY freq", () => {
                 ],
             },
         });
-        const result = event.expandTimelines();
+        const result = event.expandRrule();
         const resList = [
             new Date(1997, 8, 22, 9, 0, 0),
             new Date(1997, 9, 20, 9, 0, 0),
@@ -182,7 +182,7 @@ describe("rrule MONTHLY freq", () => {
                 BYMONTHDAY: [-3],
             },
         });
-        const result = event.expandTimelines();
+        const result = event.expandRrule();
         const resList = [
             new Date(1997, 8, 28, 9, 0, 0),
             new Date(1997, 9, 29, 9, 0, 0),
@@ -217,7 +217,7 @@ describe("rrule MONTHLY freq", () => {
                 BYMONTHDAY: [2, 15],
             },
         });
-        const result = event.expandTimelines();
+        const result = event.expandRrule();
         const resList = [
             new Date(1997, 8, 2, 9, 0, 0),
             new Date(1997, 8, 15, 9, 0, 0),
@@ -256,7 +256,7 @@ describe("rrule MONTHLY freq", () => {
                 BYMONTHDAY: [1, -1],
             },
         });
-        const result = event.expandTimelines();
+        const result = event.expandRrule();
         const resList = [
             new Date(1997, 8, 30, 9, 0, 0),
             new Date(1997, 9, 1, 9, 0, 0),
@@ -297,7 +297,7 @@ describe("rrule MONTHLY freq", () => {
                 BYMONTHDAY: [10, 11, 12, 13, 14, 15],
             },
         });
-        const result = event.expandTimelines();
+        const result = event.expandRrule();
         const resList = [
             new Date(1997, 8, 10, 9, 0, 0),
             new Date(1997, 8, 11, 9, 0, 0),
@@ -339,7 +339,7 @@ describe("rrule MONTHLY freq", () => {
                 ],
             },
         });
-        const result = event.expandTimelines();
+        const result = event.expandRrule();
         const resList = [
             new Date(1997, 8, 2, 9, 0, 0),
             new Date(1997, 8, 9, 9, 0, 0),
@@ -390,7 +390,7 @@ describe("rrule MONTHLY freq", () => {
                 BYMONTHDAY: [13],
             },
         });
-        const result = event.expandTimelines();
+        const result = event.expandRrule();
         const resList = [
             new Date(1998, 1, 13, 9, 0, 0),
             new Date(1998, 2, 13, 9, 0, 0),
@@ -429,7 +429,7 @@ describe("rrule MONTHLY freq", () => {
                 BYMONTHDAY: [7, 8, 9, 10, 11, 12, 13],
             },
         });
-        const result = event.expandTimelines();
+        const result = event.expandRrule();
         const resList = [
             new Date(1997, 8, 13, 9, 0, 0),
             new Date(1997, 9, 11, 9, 0, 0),
@@ -473,7 +473,7 @@ describe("rrule MONTHLY freq", () => {
                 BYSETPOS: [3],
             },
         });
-        const result = event.expandTimelines();
+        const result = event.expandRrule();
         const resList = [
             new Date(1997, 8, 4, 9, 0, 0),
             new Date(1997, 9, 7, 9, 0, 0),
@@ -512,7 +512,7 @@ describe("rrule MONTHLY freq", () => {
                 BYSETPOS: [-2],
             },
         });
-        const result = event.expandTimelines();
+        const result = event.expandRrule();
         const resList = [
             new Date(1997, 8, 29, 9, 0, 0),
             new Date(1997, 9, 30, 9, 0, 0),
@@ -548,7 +548,7 @@ describe("rrule MONTHLY freq", () => {
                 COUNT: 5,
             },
         });
-        const result = event.expandTimelines();
+        const result = event.expandRrule();
         const resList = [
             new Date(2007, 0, 15, 9, 0, 0),
             new Date(2007, 0, 30, 9, 0, 0),

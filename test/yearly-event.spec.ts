@@ -28,7 +28,7 @@ describe("rrule YEARLY freq", () => {
             type: EEventType.RECURRINGMASTER,
             rrule: helper.parseRrule("RRULE:FREQ=YEARLY;UNTIL=20000131T140000Z;BYMONTH=1;BYDAY=SU,MO,TU,WE,TH,FR,SA"),
         });
-        const result = event.expandTimelines();
+        const result = event.expandRrule();
         const resList = [
             {
                 start: new Date(1998, 0, 1, 9, 0, 0),
@@ -69,7 +69,7 @@ describe("rrule YEARLY freq", () => {
             type: EEventType.RECURRINGMASTER,
             rrule: helper.parseRrule("RRULE:FREQ=YEARLY;COUNT=10;BYMONTH=6,7"),
         });
-        const result = event.expandTimelines();
+        const result = event.expandRrule();
         const resList = [
             new Date(1997, 5, 10, 9, 0, 0),
             new Date(1997, 6, 10, 9, 0, 0),
@@ -106,7 +106,7 @@ describe("rrule YEARLY freq", () => {
             type: EEventType.RECURRINGMASTER,
             rrule: helper.parseRrule("RRULE:FREQ=YEARLY;INTERVAL=2;COUNT=10;BYMONTH=1,2,3"),
         });
-        const result = event.expandTimelines();
+        const result = event.expandRrule();
         const resList = [
             new Date(1997, 2, 10, 9, 0, 0),
             new Date(1999, 0, 10, 9, 0, 0),
@@ -146,7 +146,7 @@ describe("rrule YEARLY freq", () => {
             type: EEventType.RECURRINGMASTER,
             rrule: helper.parseRrule("RRULE:FREQ=YEARLY;INTERVAL=3;COUNT=10;BYYEARDAY=1,100,200"),
         });
-        const result = event.expandTimelines();
+        const result = event.expandRrule();
         const resList = [
             new Date(1997, 0, 1, 9, 0, 0),
             new Date(1997, 3, 10, 9, 0, 0),
@@ -182,7 +182,7 @@ describe("rrule YEARLY freq", () => {
             type: EEventType.RECURRINGMASTER,
             rrule: helper.parseRrule("RRULE:FREQ=YEARLY;BYDAY=20MO"),
         });
-        const result = event.expandTimelines();
+        const result = event.expandRrule();
         const resList = [
             new Date(1997, 4, 19, 9, 0, 0),
             new Date(1998, 4, 18, 9, 0, 0),
@@ -212,7 +212,7 @@ describe("rrule YEARLY freq", () => {
             type: EEventType.RECURRINGMASTER,
             rrule: helper.parseRrule("RRULE:FREQ=YEARLY;BYWEEKNO=20;BYDAY=MO"),
         });
-        const result = event.expandTimelines();
+        const result = event.expandRrule();
         const resList = [
             new Date(1997, 4, 12, 9, 0, 0),
             new Date(1998, 4, 11, 9, 0, 0),
@@ -241,7 +241,7 @@ describe("rrule YEARLY freq", () => {
             type: EEventType.RECURRINGMASTER,
             rrule: helper.parseRrule("RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=TH"),
         });
-        const result = event.expandTimelines();
+        const result = event.expandRrule();
         const resList = [
             new Date(1997, 2, 13, 9, 0, 0),
             new Date(1997, 2, 20, 9, 0, 0),
@@ -281,7 +281,7 @@ describe("rrule YEARLY freq", () => {
             type: EEventType.RECURRINGMASTER,
             rrule: helper.parseRrule("RRULE:FREQ=YEARLY;BYDAY=TH;BYMONTH=6,7,8"),
         });
-        const result = event.expandTimelines();
+        const result = event.expandRrule();
         const resList = [
             new Date(1997, 5, 5, 9, 0, 0),
             new Date(1997, 5, 12, 9, 0, 0),
@@ -348,7 +348,7 @@ describe("rrule YEARLY freq", () => {
             type: EEventType.RECURRINGMASTER,
             rrule: helper.parseRrule("RRULE:FREQ=YEARLY;INTERVAL=4;BYMONTH=11;BYDAY=TU;BYMONTHDAY=2,3,4,5,6,7,8"),
         });
-        const result = event.expandTimelines();
+        const result = event.expandRrule();
         const resList = [
             new Date(1996, 10, 5, 9, 0, 0),
             new Date(2000, 10, 7, 9, 0, 0),
