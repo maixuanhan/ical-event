@@ -62,6 +62,6 @@ export interface IEvent {
     recurid?: string;
     rrule?: IRecurrenceRule;
     attendee?: string[];
-    exdate?: TimestampMs[];
+    exdate?: ITimelineEntry[];
     rdate?: ITimelineEntry[];
 }

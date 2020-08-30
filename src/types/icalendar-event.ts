@@ -1,12 +1,13 @@
 import { IEvent, EEventType, EFreq, ITimelineEntry, EWeekday } from "./icalendar.types";
+import { AggregateHelper } from "../aggregate-helper";
 
 const EXPAND_YEAR = 100;
 
-function findIntersection(a: Date[], b: Date[]): Date[] {
-    const t = new Set<number>();
-    a.forEach(r => t.add(r.getTime()));
-    return b.filter(r => t.has(r.getTime()));
-}
+// function findIntersection(a: Date[], b: Date[]): Date[] {
+//     const t = new Set<number>();
+//     a.forEach(r => t.add(r.getTime()));
+//     return b.filter(r => t.has(r.getTime()));
+// }
 
 export interface IActionResult {
     success: boolean;
@@ -71,12 +72,14 @@ export class Event {
 
     public expandRrule(): ITimelineEntry[] {
         if (this.event.type !== EEventType.RECURRINGMASTER) {
-            return [{
-                event: this.event,
-                startTime: this.event.dtstart,
-                endTime: this.event.dtend,
-            }];
+            return [];
         }
+
+        const aggregater = new AggregateHelper<Date>(
+            (x) => x.getTime().toString(),
+            (a, b) => a.getTime() - b.getTime(),
+        );
+
         const { rrule, dtstart, dtend, rdate, exdate } = this.event;
         const { FREQ, COUNT, UNTIL } = rrule;
         const duration = this.event.duration ? this.event.duration : dtend - dtstart;
@@ -172,7 +175,7 @@ export class Event {
 
                         let intermediateResult: Date[] = [];
                         if (bymonthday.length && byday.length) {
-                            intermediateResult = findIntersection(monthDates, dayDates);
+                            intermediateResult = aggregater.join(monthDates, dayDates);
                         } else if (bymonthday.length) {
                             intermediateResult = monthDates;
                         } else if (byday.length) {
@@ -242,7 +245,7 @@ export class Event {
                     if (list.length === 1) {
                         intermediateResult = list[0];
                     } else if (list.length > 1) {
-                        intermediateResult = list.reduce((acc, cur) => findIntersection(acc, cur));
+                        intermediateResult = list.reduce((acc, cur) => aggregater.join(acc, cur));
                     }
                     intermediateResult.sort((a, b) => a.getTime() - b.getTime());
                     intermediateResult.forEach(r => {
@@ -313,7 +316,7 @@ export class Event {
 
                     let intermediateResult: Date[] = [];
                     if (bymonthday.length && byday.length) {
-                        intermediateResult = findIntersection(fromBymonthday, fromByday);
+                        intermediateResult = aggregater.join(fromBymonthday, fromByday);
                     } else if (bymonthday.length) {
                         intermediateResult = fromBymonthday;
                     } else if (byday.length) {
@@ -370,6 +373,22 @@ export class Event {
         return rrule.COUNT && rrule.COUNT < sorted.length ? sorted.slice(0, rrule.COUNT) : sorted;
     }
 
-    // public expandTimelines(): ITimelineEntry[] {
-    // }
+    public expand(): ITimelineEntry[] {
+        if (this.event.type !== EEventType.RECURRINGMASTER) {
+            return [{
+                event: this.event,
+                startTime: this.event.dtstart,
+                endTime: this.event.dtend,
+            }];
+        }
+
+        const aggregater = new AggregateHelper<ITimelineEntry>(
+            (x) => x.startTime.toString(),
+            (a, b) => a.startTime - b.startTime,
+        );
+        const fromRrule = this.expandRrule();
+        const fromRdate = this.event.rdate;
+        const fromExdate = this.event.exdate;
+        return aggregater.exclude(aggregater.union(fromRrule, fromRdate), fromExdate);
+    }
 }
