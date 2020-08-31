@@ -1,7 +1,6 @@
 export class AggregateHelper<T> {
     constructor(
         private identify: (x: T) => string,
-        private compare: (a: T, b: T) => number,
     ) { }
 
     public join(a: T[], b: T[]): T[] {

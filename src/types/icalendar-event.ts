@@ -3,12 +3,6 @@ import { AggregateHelper } from "../aggregate-helper";
 
 const EXPAND_YEAR = 100;
 
-// function findIntersection(a: Date[], b: Date[]): Date[] {
-//     const t = new Set<number>();
-//     a.forEach(r => t.add(r.getTime()));
-//     return b.filter(r => t.has(r.getTime()));
-// }
-
 export interface IActionResult {
     success: boolean;
     message?: string;
@@ -77,7 +71,6 @@ export class Event {
 
         const aggregater = new AggregateHelper<Date>(
             (x) => x.getTime().toString(),
-            (a, b) => a.getTime() - b.getTime(),
         );
 
         const { rrule, dtstart, dtend, rdate, exdate } = this.event;
@@ -384,7 +377,6 @@ export class Event {
 
         const aggregater = new AggregateHelper<ITimelineEntry>(
             (x) => x.startTime.toString(),
-            (a, b) => a.startTime - b.startTime,
         );
         const fromRrule = this.expandRrule();
         const fromRdate = this.event.rdate || [];
