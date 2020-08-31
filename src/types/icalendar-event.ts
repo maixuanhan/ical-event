@@ -387,8 +387,8 @@ export class Event {
             (a, b) => a.startTime - b.startTime,
         );
         const fromRrule = this.expandRrule();
-        const fromRdate = this.event.rdate;
-        const fromExdate = this.event.exdate;
+        const fromRdate = this.event.rdate || [];
+        const fromExdate = this.event.exdate || [];
         return aggregater.exclude(aggregater.union(fromRrule, fromRdate), fromExdate);
     }
 }

@@ -2,7 +2,7 @@ import { Event } from "../src/types/icalendar-event";
 import { Helper } from "../src/icalendar-helper";
 import { expect } from "chai";
 import "mocha";
-import { EEventType } from "../src/types/icalendar.types";
+import { EEventType, IEvent } from "../src/types/icalendar.types";
 
 const helper = new Helper();
 
@@ -183,5 +183,146 @@ describe("rrule DAILY freq", () => {
         expect(result, "Number of occurrences").length((31 - 1 + 1) * 3);
         expect(result.every(r => resList.some(s => s.start.getTime() <= r.startTime && r.startTime <= s.end.getTime())),
             "Instance values").be.true;
+    });
+
+    it("Test expand(): RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5", () => {
+        const event = new Event({
+            uid: "daily6",
+            dtstart: helper.parseDateOrDateTime("19970902T090000"),
+            duration: 30 * 60 * 1000,
+            type: EEventType.RECURRINGMASTER,
+            rrule: helper.parseRrule("RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5"),
+        });
+        const result = event.expand();
+        const resList = [
+            new Date(1997, 8, 2, 9, 0, 0),
+            new Date(1997, 8, 12, 9, 0, 0),
+            new Date(1997, 8, 22, 9, 0, 0),
+            new Date(1997, 9, 2, 9, 0, 0),
+            new Date(1997, 9, 12, 9, 0, 0),
+        ];
+        expect(result, "Number of occurrences").length(resList.length);
+        result.forEach(r => {
+            expect(resList.some(s => s.getTime() === r.startTime), `Instance values: ${new Date(r.startTime)}`).be.true;
+        });
+    });
+
+    it("Test expand() with RRULE, RDATE", () => {
+        const exceptionEvent: IEvent = {
+            dtstart: new Date(1999, 1, 28, 9, 0, 0).getTime(),
+            dtend: new Date(1999, 1, 28, 11, 0, 0).getTime(),
+            uid: "dummy",
+            type: EEventType.EXCEPTION,
+        };
+        const event = new Event({
+            uid: "daily7",
+            dtstart: helper.parseDateOrDateTime("19980101T090000"),
+            duration: 30 * 60 * 1000,
+            type: EEventType.RECURRINGMASTER,
+            rrule: helper.parseRrule("RRULE:FREQ=DAILY;UNTIL=20000131T140000Z;BYMONTH=1"),
+            rdate: [
+                {
+                    startTime: exceptionEvent.dtstart,
+                    endTime: exceptionEvent.dtend,
+                    event: exceptionEvent,
+                },
+            ],
+        });
+        const result = event.expand();
+        const resList = [
+            {
+                start: new Date(1998, 0, 1, 9, 0, 0),
+                end: new Date(1998, 0, 31, 9, 0, 0),
+            },
+            {
+                start: new Date(1999, 0, 1, 9, 0, 0),
+                end: new Date(1999, 0, 31, 9, 0, 0),
+            },
+            {
+                start: new Date(2000, 0, 1, 9, 0, 0),
+                end: new Date(2000, 0, 31, 9, 0, 0),
+            },
+        ];
+        expect(result, "Number of occurrences").length((31 - 1 + 1) * 3 + 1);
+        expect(result.every(r => resList.some(s => s.start.getTime() <= r.startTime && r.startTime <= s.end.getTime() ||
+            r.startTime === exceptionEvent.dtstart)), "Instance values").be.true;
+    });
+
+    it("Test expand() with RRULE, EXDATE", () => {
+        const exceptionEvent: IEvent = {
+            dtstart: new Date(1997, 8, 22, 9, 0, 0).getTime(),
+            duration: 30 * 60 * 1000,
+            uid: "dummy",
+            type: EEventType.EXCEPTION,
+            isCancelled: true,
+        };
+        const event = new Event({
+            uid: "daily8",
+            dtstart: helper.parseDateOrDateTime("19970902T090000"),
+            duration: 30 * 60 * 1000,
+            type: EEventType.RECURRINGMASTER,
+            rrule: helper.parseRrule("RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5"),
+            exdate: [
+                {
+                    startTime: exceptionEvent.dtstart,
+                    endTime: exceptionEvent.dtstart + exceptionEvent.duration,
+                    event: exceptionEvent,
+                },
+            ],
+        });
+        const result = event.expand();
+        const resList = [
+            new Date(1997, 8, 2, 9, 0, 0),
+            new Date(1997, 8, 12, 9, 0, 0),
+            new Date(1997, 9, 2, 9, 0, 0),
+            new Date(1997, 9, 12, 9, 0, 0),
+        ];
+        expect(result, "Number of occurrences").length(resList.length);
+        result.forEach(r => {
+            expect(resList.some(s => s.getTime() === r.startTime), `Instance values: ${new Date(r.startTime)}`).be.true;
+        });
+    });
+
+    it("Test expand() with RRULE, RDATE, EXDATE", () => {
+        const exceptionEvent: IEvent = {
+            dtstart: new Date(1997, 8, 22, 9, 0, 0).getTime(),
+            duration: 30 * 60 * 1000,
+            uid: "dummy",
+            type: EEventType.EXCEPTION,
+            isCancelled: true,
+        };
+        const event = new Event({
+            uid: "daily9",
+            dtstart: helper.parseDateOrDateTime("19970902T090000"),
+            duration: 30 * 60 * 1000,
+            type: EEventType.RECURRINGMASTER,
+            rrule: helper.parseRrule("RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5"),
+            exdate: [
+                {
+                    startTime: exceptionEvent.dtstart,
+                    endTime: exceptionEvent.dtstart + exceptionEvent.duration,
+                    event: exceptionEvent,
+                },
+            ],
+            rdate: [
+                {
+                    startTime: new Date(1997, 8, 25, 9, 0, 0).getTime(),
+                    endTime: exceptionEvent.dtstart + exceptionEvent.duration,
+                    event: exceptionEvent,
+                },
+            ],
+        });
+        const result = event.expand();
+        const resList = [
+            new Date(1997, 8, 2, 9, 0, 0),
+            new Date(1997, 8, 12, 9, 0, 0),
+            new Date(1997, 8, 25, 9, 0, 0),
+            new Date(1997, 9, 2, 9, 0, 0),
+            new Date(1997, 9, 12, 9, 0, 0),
+        ];
+        expect(result, "Number of occurrences").length(resList.length);
+        result.forEach(r => {
+            expect(resList.some(s => s.getTime() === r.startTime), `Instance values: ${new Date(r.startTime)}`).be.true;
+        });
     });
 });
