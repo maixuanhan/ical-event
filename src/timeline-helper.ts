@@ -18,13 +18,26 @@ export class TimelineHelper {
         this.daily = new Map();
         this.weekly = new Map();
         this.monthly = new Map();
+        this.countTimeUsed();
     }
 
     public getLength() {
         return this.getLastTime() - this.getFirstTime();
     }
 
-    public countTimeUsed(): void {
+    public getDailyUsed(): ITimeUsed[] {
+        return this.mapToArray(this.daily);
+    }
+
+    public getWeeklyUsed(): ITimeUsed[] {
+        return this.mapToArray(this.weekly);
+    }
+
+    public getMonthlyUsed(): ITimeUsed[] {
+        return this.mapToArray(this.monthly);
+    }
+
+    private countTimeUsed(): void {
         const ONE_DAY_MS = 24 * 60 * 60 * 1000;
         this.timelines.forEach(r => {
             let key = this.hashDay(r.startTime);
@@ -43,18 +56,6 @@ export class TimelineHelper {
             const monthKey = this.hashMonth(k);
             this.monthly.set(monthKey, (this.monthly.get(monthKey) ?? 0) + v);
         });
-    }
-
-    public getDailyUsed(): ITimeUsed[] {
-        return this.mapToArray(this.daily);
-    }
-
-    public getWeeklyUsed(): ITimeUsed[] {
-        return this.mapToArray(this.weekly);
-    }
-
-    public getMonthlyUsed(): ITimeUsed[] {
-        return this.mapToArray(this.monthly);
     }
 
     private mapToArray(x: Map<number, number>): ITimeUsed[] {

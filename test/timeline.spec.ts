@@ -55,7 +55,6 @@ describe("Timeline tests", () => {
         ];
 
         const h = new TimelineHelper(list);
-        h.countTimeUsed();
         const dailyUsed = h.getDailyUsed();
         const weeklyUsed = h.getWeeklyUsed();
         const monthlyUsed = h.getMonthlyUsed();
@@ -82,7 +81,6 @@ describe("Timeline tests", () => {
         const list: ITimelineEntry[] = [];
 
         const h = new TimelineHelper(list);
-        h.countTimeUsed();
         const dailyUsed = h.getDailyUsed();
         const weeklyUsed = h.getWeeklyUsed();
         const monthlyUsed = h.getMonthlyUsed();
@@ -112,7 +110,6 @@ describe("Timeline tests", () => {
         ];
 
         const h = new TimelineHelper(list);
-        h.countTimeUsed();
         const dailyUsed = h.getDailyUsed();
         const weeklyUsed = h.getWeeklyUsed();
         const monthlyUsed = h.getMonthlyUsed();
